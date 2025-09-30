@@ -1,3 +1,10 @@
+graph TD
+A[Mermaid ok?] --> B{Renderizou?}
+B -->|sim| C[Pronto!]
+B -->|não| D[Ver passos abaixo]
+
+
+
 # FastFood API - SOAT Tech Challenge
 <hr>
 Este projeto é uma API para um sistema de autoatendimento de uma lanchonete, desenvolvida utilizando arquitetura hexagonal e clean architecture.
