@@ -87,66 +87,9 @@ Afim de evitar erros, também está disponível pelo google drive, através do l
 <h2>Vídeo de apresentação:</h2>
 
 
-Mermaid ERD:
+Estrutura do banco de dados:
 
-erDiagram
-  CLIENTE ||--o{ PEDIDO : "clienteId"
-  PEDIDO  ||--|{ ITEM_PEDIDO : "contém"
-  PRODUTO ||--o{ ITEM_PEDIDO : "aparece_em"
-  PEDIDO  ||--|| PAGAMENTO : "possui"
-  CATEGORIA_PRODUTO ||--o{ PRODUTO : "categoriaId"
-
-  CLIENTE {
-    string  id PK
-    string  nome
-    string  email UNIQUE
-    string  cpf UNIQUE
-    bool    ativo
-    bool    recebeEmail
-    datetime criadoEm
-    datetime atualizadoEm
-  }
-
-  CATEGORIA_PRODUTO {
-    string  id PK
-    string  nome UNIQUE
-    datetime criadoEm
-    datetime atualizadoEm
-  }
-
-  PRODUTO {
-    string  id PK
-    string  nome
-    decimal preco
-    string  categoriaId FK
-    datetime criadoEm
-    datetime atualizadoEm
-  }
-
-  PEDIDO {
-    string  id PK
-    string  clienteId FK nullable
-    string  statusPedido      // enum: RECEBIDO | EM_PREPARACAO | PRONTO | FINALIZADO
-    string  statusPagamento   // enum: AGUARDANDO | APROVADO | RECUSADO | ESTORNADO
-    datetime criadoEm
-    datetime atualizadoEm
-  }
-
-  ITEM_PEDIDO {
-    string pedidoId PK,FK
-    string produtoId PK,FK
-    int    quantidade
-  }
-
-  PAGAMENTO {
-    string  id PK
-    string  pedidoId UNIQUE,FK  // 1:1 com Pedido
-    string  metodo
-    string  status              // enum StatusPagamento
-    datetime criadoEm
-    datetime atualizadoEm
-  }
-
+<img align="center" width="821" height="831" alt="Arquitetura BD" src="https://github.com/GabiTaccari/soat-tech-fase3/blob/main/Untitled%20diagram%20_%20Mermaid%20Chart-2025-09-30-230741.png" />
 
 Escolhemos PostgreSQL pela maturidade, suporte a transações, constraints fortes (FK, unique, enums via Prisma), facilidade de migração com Prisma, e por ser oferecido como serviço gerenciado (AWS RDS). Para nosso domínio (pedidos, itens, pagamentos) a modelagem relacional garante integridade (ex.: ItemPedido com PK composta) e consultas eficientes com índices (statusPedido, criadoEm, clienteId).
 Rodando as migrations:
