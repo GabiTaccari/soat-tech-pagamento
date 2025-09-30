@@ -145,6 +145,12 @@ erDiagram
     datetime atualizadoEm
   }
 
+Escolhemos PostgreSQL pela maturidade, suporte a transações, constraints fortes (FK, unique, enums via Prisma), facilidade de migração com Prisma, e por ser oferecido como serviço gerenciado (AWS RDS). Para nosso domínio (pedidos, itens, pagamentos) a modelagem relacional garante integridade (ex.: ItemPedido com PK composta) e consultas eficientes com índices (statusPedido, criadoEm, clienteId).
+Rodando as migrations:
+```console
+npx prisma migrate deploy
+npx prisma db seed
+```
 
 <br>
 <h3>Alunos:</h3><br>
