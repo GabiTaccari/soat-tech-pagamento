@@ -56,6 +56,7 @@ https://www.youtube.com/watch?v=0vOqRazB4oI
 <h2>Evidência de cobertura de testes</h2>
 <br>
 <h4>Pagamento: </h4>
+<img align="center" width="570" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/testes%20pagamento.PNG" />
 <br>
 <h4>Pedido: </h4>
 <br>
