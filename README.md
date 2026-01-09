@@ -1,14 +1,9 @@
-
 # FastFood API - SOAT Tech Challenge
 <hr>
 Este projeto é uma API para um sistema de autoatendimento de uma lanchonete, desenvolvida utilizando arquitetura hexagonal e clean architecture.
 <br>
 <h2>Arquitetura desenvolvida</h2>
-<br><br>
-<img align="center" width="821" height="831" alt="Arquitetura Cluster Aplicação" src="https://github.com/user-attachments/assets/10df2e49-5607-4cf1-b8c8-6cba4c3f16db" />
-<br><br>
-<img align="center" width="761" height="571" alt="Arquitetura Aplicação" src="https://github.com/user-attachments/assets/b3072f35-9d00-493e-a2e7-7ddfcaf5a6a9" />
-
+<img align="center" width="570" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/diagrama.png" />
 <h2>Funcionalidades atendidas:</h2>
 
 - Produtos:
@@ -37,48 +32,11 @@ Este projeto é uma API para um sistema de autoatendimento de uma lanchonete, de
     - QR Code de pagamento do mercado pago
     - Webhook de retorno para confirmação de pagamento
     - Consulta de status de pagamento
-  
-<h2>Como executar localmente</h2>
-Nota: No caso de execução localmente, necessário comentar a linha XX do arquivo .env e descomentar a linha XX do arquivo .env (banco de dados)<br/>
-Start do ngrok -> necessário para o webhook do mercado pago.<br/>
 
-
-```
-ngrok http localhost:3000
-```
-Substituir a URL fornecida pelo ngrok no arquivo XX, linha XX. Isso fará com que o pagamento seja retornado pelo MP e atualizado em nossa base de dados.
-Start do docker:
-```console
-docker compose build --no-cache
-docker compose up
-```
-
-<h2>Como executar localmente (minikube)</h2>
-Minikube/Kubernete
-
-```bash
-minikube start
-minikube service soat-tech-service
-kubectl get pods
-kubectl exec
-NOME_DO_POD -- npx prisma migrate dev --name init
-NOME_DO_POD -- sh
-npx ts-node /app/prisma/seed.ts
-kubectl rollout restart deployment soat-tech-deployment
-```
-Start do ngrok -> necessário para o webhook do mercado pago.
-```console
-kubectl get services
-minikube ip
-ngrok http minikube_ip:porta_get_services
-```
-
-<h2>Postman Collection e execução das APIs:</h2>
+ <h2>Postman Collection e execução das APIs:</h2>
 <br><br>
 <h4>Postman Collection</h4><br>
 O arquivo da collection do postman está disponível na raiz desse repositório, sendo disponibilizada nesse link: https://github.com/GabiTaccari/fiap-fase2/blob/main/SOAT%20Tech%20-%20fase%202.postman_collection
-<br>
-Afim de evitar erros, também está disponível pelo google drive, através do link: https://drive.google.com/file/d/1BJyUuyNDVpgjI51X_1XthT1ZwEoZfuzO/view?usp=sharing <br>
 <br>
 
 <h4>Ordem de execução das APIs:</h4>
@@ -92,22 +50,21 @@ Afim de evitar erros, também está disponível pelo google drive, através do l
 - Atualizar status do pedido<br/>
 <br/>
 
-
 <h2>Vídeo de apresentação:</h2>
 https://www.youtube.com/watch?v=0vOqRazB4oI
 
-<h2>Estrutura do banco de dados:</h2>
-
-<img align="center" width="821" height="831" alt="Arquitetura BD" src="https://github.com/GabiTaccari/soat-tech-fase3/blob/main/Untitled%20diagram%20_%20Mermaid%20Chart-2025-09-30-230741.png" />
-
-Escolhemos PostgreSQL pela maturidade, suporte a transações, constraints fortes (FK, unique, enums via Prisma), facilidade de migração com Prisma, e por ser oferecido como serviço gerenciado (AWS RDS). Para nosso domínio (pedidos, itens, pagamentos) a modelagem relacional garante integridade (ex.: ItemPedido com PK composta) e consultas eficientes com índices (statusPedido, criadoEm, clienteId).
-Rodando as migrations:
-```console
-npx prisma migrate deploy
-npx prisma db seed
-```
-
+<h2>Evidência de cobertura de testes</h2>
 <br>
+<h4>Pagamento: </h4>
+<img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/testes%20pagamento.PNG" />
+<br>
+<h4>Pedido: </h4>
+<img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/teste%20pedido.PNG" />
+<br>
+<h4>Produção: </h4>
+<img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/teste%20producao.PNG" />
+
+<br><br>
 <h3>Alunos:</h3><br>
 Gabriela Gonçalves Taccari (RM:rm360973 Discord: #gabriela3468)<br/>
 Rainer Lima Gramm (RM: 360974 Discord: #gramm9227)<br/>
