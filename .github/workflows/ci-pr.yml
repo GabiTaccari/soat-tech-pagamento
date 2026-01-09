@@ -1,0 +1,35 @@
+name: CI (PR)
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Test with coverage
+        run: npm run test:cov
+
+      - name: Enforce coverage >= 70%
+        run: |
+          node -e "
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('coverage/coverage-summary.json','utf8'));
+          const t=j.total;
+          const min=70;
+          const ok = t.statements.pct>=min && t.branches.pct>=min && t.functions.pct>=min && t.lines.pct>=min;
+          console.log('Coverage:', t);
+          if(!ok){ console.error('Coverage below 70%'); process.exit(1); }
+          "
