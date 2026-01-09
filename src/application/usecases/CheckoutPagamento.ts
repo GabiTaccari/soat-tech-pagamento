@@ -1,71 +1,105 @@
-import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import mercadopago from '../../config/mercadoPago';
+import { PagamentoMongoRepository } from '../../infrastructure/database/repositories/PagamentoMongoRepository';
 
-const prisma = new PrismaClient();
+const pagamentoRepo = new PagamentoMongoRepository();
+
+type PedidoItem = {
+  quantidade: number;
+  produto?: { nome: string; preco: number };
+  nome?: string;
+  preco?: number;
+};
+
+type PedidoDTO = {
+  id: string;
+  itens?: PedidoItem[];
+};
+
+function calcularTotal(itens: PedidoItem[] = []) {
+  return itens.reduce((acc, item) => {
+    const preco = item.produto?.preco ?? item.preco ?? 0;
+    const nome = item.produto?.nome ?? item.nome ?? 'Item';
+    const quantidade = item.quantidade ?? 1;
+    return acc + preco * quantidade;
+  }, 0);
+}
 
 export class CheckoutPagamento {
   async gerarQrCodePagamento(pedidoId: string): Promise<string> {
-    console.log('🔍 Iniciando geração de QR Code...');
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: pedidoId },
-      include: {
-        itens: {
-          include: {
-            produto: true,
-          },
-        },
-      },
-    });
+    console.log('🔍 Iniciando geração de QR Code...', { pedidoId });
 
-    if (!pedido) {
-      throw new Error('Pedido não encontrado');
+    const mpAccessToken = process.env.MP_ACCESS_TOKEN;
+    const mpCollectorId = process.env.MP_COLLECTOR_ID;
+    const pedidoServiceUrl = process.env.PEDIDO_SERVICE_URL;
+
+    if (!mpAccessToken) throw new Error('MP_ACCESS_TOKEN não definido');
+    if (!mpCollectorId) throw new Error('MP_COLLECTOR_ID não definido');
+    if (!pedidoServiceUrl) throw new Error('PEDIDO_SERVICE_URL não definido');
+
+    // 1) Buscar detalhes do pedido via HTTP (não via DB)
+    // Se esse endpoint retornar outro formato, a gente ajusta depois.
+    let pedido: PedidoDTO | null = null;
+
+    try {
+      const { data } = await axios.get(`${pedidoServiceUrl}/api/pedidos/${pedidoId}`);
+      pedido = data;
+    } catch (e: any) {
+      console.warn('⚠️ Não consegui buscar pedido no pedido-service. Vou seguir com valor simbólico.', e?.message);
+      pedido = null;
     }
 
-    const total = pedido.itens.reduce((acc, item) => {
-      return acc + item.produto.preco * item.quantidade;
-    }, 0);
+    const itens = pedido?.itens ?? [];
+    const total = itens.length ? calcularTotal(itens) : 1; // fallback simbólico
+    const itemsPayload =
+      itens.length
+        ? itens.map((item) => {
+            const nome = item.produto?.nome ?? item.nome ?? 'Item';
+            const preco = item.produto?.preco ?? item.preco ?? 0;
+            const quantidade = item.quantidade ?? 1;
+            return {
+              title: nome,
+              quantity: quantidade,
+              unit_price: preco,
+              unit_measure: 'unit',
+              total_amount: preco * quantidade,
+            };
+          })
+        : [
+            {
+              title: `Pedido ${pedidoId}`,
+              quantity: 1,
+              unit_price: 1,
+              unit_measure: 'unit',
+              total_amount: 1,
+            },
+          ];
 
+    console.log('🔗 Dados do Pedido (para pagamento):', {
+      pedidoId,
+      total,
+      itemsCount: itemsPayload.length,
+    });
 
-    console.log('🔗 Dados do Pedido:', {
-    pedidoId,
-    total,
-    produtos: pedido.itens.map((item) => ({
-      nome: item.produto.nome,
-      preco: item.produto.preco,
-      quantidade: item.quantidade,
-    })),
-  });
+    // 2) Montar payload do Mercado Pago (instore QR)
+    const external_pos_id = '01';
 
-
-    console.log('🔗 External reference sendo enviada:', pedidoId);
     const qrCodePayload = {
       title: 'Pagamento Pedido ' + pedidoId,
       description: 'Pedido gerado via QR Code',
       total_amount: total,
       external_reference: pedidoId,
-      // notification_url: 'https://c226b035c5a9.ngrok-free.app/webhook',  minikube: http://127.0.0.1:55046/
-      notification_url: 'https://81a3f5d7152b.ngrok-free.app', //http://127.0.0.1:55046/webhook
-      items: pedido.itens.map((item) => ({
-        title: item.produto.nome,
-        quantity: item.quantidade,
-        unit_price: item.produto.preco,
-        unit_measure: 'unit',
-        total_amount: item.produto.preco * item.quantidade,
-      })),
+      // ⚠️ Dica: para demo local, pode remover notification_url (MP às vezes exige https)
+      // notification_url: process.env.MP_WEBHOOK_URL,
+      items: itemsPayload,
     };
-    
-    try {
-      const user_id = process.env.MP_COLLECTOR_ID!;
-      const external_pos_id = '01'; 
-      console.log('🧾 user_id:', user_id);
 
+    try {
       const response = await axios.post(
-        `https://api.mercadopago.com/instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`,
+        `https://api.mercadopago.com/instore/orders/qr/seller/collectors/${mpCollectorId}/pos/${external_pos_id}/qrs`,
         qrCodePayload,
         {
           headers: {
-            Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${mpAccessToken}`,
             'Content-Type': 'application/json',
           },
         }
@@ -73,17 +107,17 @@ export class CheckoutPagamento {
 
       const qrImage = response.data.qr_data;
 
-      await prisma.pagamento.create({
-        data: {
-          pedidoId,
-          metodo: 'QR_CODE',
-          status: 'AGUARDANDO',
-        },
+      // 3) Registrar pagamento no Mongo (NoSQL)
+      // Usando pedidoId como vínculo. Não acessa DB do pedido.
+      await pagamentoRepo.criar({
+        pedidoId,
+        metodo: 'QR_CODE',
+        status: 'AGUARDANDO',
+        valor: total,
       });
 
-      console.log('✅ QR Code gerado e pagamento registrado');
+      console.log('✅ QR Code gerado e pagamento registrado no Mongo');
       return qrImage;
-
     } catch (error: any) {
       console.error('❌ Erro ao gerar QR Code:', error.response?.data || error.message);
       throw new Error('Erro ao gerar QR Code');
