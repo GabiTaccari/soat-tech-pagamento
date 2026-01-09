@@ -59,6 +59,7 @@ https://www.youtube.com/watch?v=0vOqRazB4oI
 <img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/testes%20pagamento.PNG" />
 <br>
 <h4>Pedido: </h4>
+<img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/teste%20pedido.PNG" />
 <br>
 <h4>Produção: </h4>
 
