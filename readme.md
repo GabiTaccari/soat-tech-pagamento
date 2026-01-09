@@ -3,7 +3,7 @@
 Este projeto é uma API para um sistema de autoatendimento de uma lanchonete, desenvolvida utilizando arquitetura hexagonal e clean architecture.
 <br>
 <h2>Arquitetura desenvolvida</h2>
-<img align="center" width="761" height="571" alt="Arquitetura Aplicação" src="https://github.com/user-attachments/assets/b3072f35-9d00-493e-a2e7-7ddfcaf5a6a9]" />
+<img align="center" width="570" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/diagrama.png" />
 <h2>Funcionalidades atendidas:</h2>
 
 - Produtos:
