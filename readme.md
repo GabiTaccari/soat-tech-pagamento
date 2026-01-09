@@ -64,7 +64,7 @@ https://www.youtube.com/watch?v=0vOqRazB4oI
 <h4>Produção: </h4>
 <img align="center" width="750" height="570" alt="Arquitetura Aplicação" src="https://raw.githubusercontent.com/GabiTaccari/soat-tech-pagamento/refs/heads/main/teste%20producao.PNG" />
 
-<br>
+<br><br>
 <h3>Alunos:</h3><br>
 Gabriela Gonçalves Taccari (RM:rm360973 Discord: #gabriela3468)<br/>
 Rainer Lima Gramm (RM: 360974 Discord: #gramm9227)<br/>
