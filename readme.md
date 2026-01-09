@@ -69,4 +69,3 @@ https://www.youtube.com/watch?v=0vOqRazB4oI
 Gabriela Gonçalves Taccari (RM:rm360973 Discord: #gabriela3468)<br/>
 Rainer Lima Gramm (RM: 360974 Discord: #gramm9227)<br/>
 Felipe Mello (RM: 361257)<br/>
-
